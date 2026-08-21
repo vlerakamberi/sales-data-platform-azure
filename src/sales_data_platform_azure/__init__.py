@@ -1,0 +1,3 @@
+"""Northstar Retail Azure sales data platform foundation."""
+
+__version__ = "0.1.0"

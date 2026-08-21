@@ -1,0 +1,42 @@
+# Virtual environments
+.venv/
+venv/
+
+# Local configuration and secrets (the safe template stays tracked)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+secrets/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# Logs and local output
+*.log
+logs/
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.code-workspace
+.DS_Store
+Thumbs.db
+
