@@ -29,6 +29,10 @@ build/
 dist/
 *.egg-info/
 
+# Locally compiled Bicep/ARM artifacts
+infrastructure/bicep/main.json
+infrastructure/bicep/environments/*.json
+
 # Logs and local output
 *.log
 logs/
@@ -39,4 +43,3 @@ logs/
 *.code-workspace
 .DS_Store
 Thumbs.db
-

@@ -1,6 +1,6 @@
 # Approved Architecture Baseline
 
-Status: **APPROVED / NOT YET IMPLEMENTED**
+Status: **APPROVED / INFRASTRUCTURE DEFINED — NOT PROVISIONED**
 
 ## Target flow and boundaries
 
@@ -31,6 +31,6 @@ scaling, retention, and service tiers must be justified per environment.
 Repository 2 owns the Azure platform. Frozen Repository 1 is independent and is not a runtime
 dependency. Repositories 3 and 4, dimensional warehousing, and BI are outside this scope.
 
-Unit 1 supplies no Bicep resources, ADF pipelines, containers, databases, identities, RBAC,
-Key Vault objects, or monitoring integrations. Those require later authorization.
-
+Unit 2 supplies declarative Bicep definitions for the approved resource boundaries. It does not
+provision them. ADF pipelines, runnable transformation containers, database schemas, detailed RBAC,
+application diagnostics, and all live Azure behavior require later authorization.

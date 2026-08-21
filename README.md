@@ -12,18 +12,18 @@ transformation, a distinct data-quality boundary, and Azure Database for Postgre
 serving layer. Entra ID, managed identities, least-privilege RBAC, and Key Vault form the identity
 and secret hierarchy. Azure Monitor and Log Analytics are the later observability direction.
 
-These components describe approved architecture. **No Azure resources have been provisioned and
-no Azure functionality is implemented in Unit 1.** Development and production will be isolated;
-replay will begin from the durable raw boundary.
+These components describe approved architecture. **Infrastructure is defined but not provisioned.**
+No Azure resource currently exists as a result of this repository. Development and production are
+represented as isolated parameterized environments; replay will begin from the durable raw boundary.
 
 See the [architecture baseline](docs/architecture/baseline.md), [business requirements
 summary](docs/architecture/business-requirements.md), and [accepted ADRs](docs/adr/README.md).
 
 ## Current implementation status
 
-Unit 1 establishes repository layout, Python packaging, environment-driven configuration,
-structured standard-library logging, local tests, quality tooling, and governed documentation.
-Milestone 1 is not complete. Units 2–10 remain unimplemented.
+Unit 1 established the repository foundation. Unit 2 adds locally validated Bicep definitions for
+the approved Azure resource boundaries. Milestone 1 is not complete; Units 3–10 remain unimplemented,
+and no infrastructure deployment is authorized.
 
 ## Development setup (Windows PowerShell)
 
@@ -56,4 +56,3 @@ Never commit secrets or shared production credentials. `.env` and common credent
 are ignored; `.env.example` contains safe, non-secret examples only. Later Azure implementation
 must prefer Entra ID and managed identities, use least-privilege RBAC, and use Key Vault only
 when a secret is unavoidable. See the [security baseline](docs/security/baseline.md).
-
