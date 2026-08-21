@@ -12,3 +12,6 @@
 
 Unit 1 creates no live identity, Key Vault, role assignment, or other Azure resource.
 
+Unit 5 adds conditional, definition-only workload RBAC and local secret-free security contracts; see
+[identity and access boundaries](identity-access-boundaries.md). No security definition has been
+deployed and no live identity, assignment, or secret operation has occurred.

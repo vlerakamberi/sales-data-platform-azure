@@ -24,14 +24,17 @@ summary](docs/architecture/business-requirements.md), and [accepted ADRs](docs/a
 Unit 1 established the repository foundation, and Unit 2 added locally validated Bicep definitions.
 Unit 3 adds an independently testable local sales transformation and Data Quality runtime plus a
 non-root container definition. Unit 4 adds cloud-neutral contracts for deterministic raw,
-processed, curated, and quarantine object addressing without an Azure client or cloud access.
-Milestone 1 is not complete; Units 5–10 remain unimplemented, and no infrastructure deployment,
-cloud integration, or container image push has occurred.
+processed, curated, and quarantine object addressing without an Azure client or cloud access. Unit
+5 defines environment-isolated system identities, bounded RBAC-as-code, and secret-free security
+contracts without deployment. Milestone 1 is not complete; Units 6–10 remain unimplemented, and no
+infrastructure deployment, cloud integration, or container image push has occurred.
 
 See the [Unit 3 runtime guide](docs/development/transformation-runtime.md) for its JSON contract,
 explicit `ACCEPTED`/`REJECTED`/`FAILED` semantics, local CLI, replay guarantees, and container use.
 See the [cloud data layer contract](docs/architecture/data-layer-contract.md) for Unit 4 layer,
 identity, deterministic path, replay, quarantine traceability, and no-Azure boundaries.
+See the [identity and access boundaries](docs/security/identity-access-boundaries.md) for Unit 5
+managed identity, least-privilege, environment isolation, secret reference, and PostgreSQL rules.
 
 ## Development setup (Windows PowerShell)
 

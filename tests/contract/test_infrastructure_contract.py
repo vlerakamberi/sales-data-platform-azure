@@ -27,6 +27,7 @@ def test_expected_modules_are_composed() -> None:
         "container-registry.bicep",
         "data-factory.bicep",
         "key-vault.bicep",
+        "identity-rbac.bicep",
         "monitoring.bicep",
         "postgresql.bicep",
         "storage.bicep",
@@ -76,16 +77,44 @@ def test_governance_tags_and_outputs_are_present() -> None:
     assert expected_outputs <= actual_outputs
 
 
-def test_iac_contains_no_role_assignments_or_secret_literals() -> None:
+def test_iac_contains_no_secret_literals() -> None:
     all_iac = "\n".join(
         path.read_text(encoding="utf-8")
         for path in BICEP_ROOT.rglob("*")
         if path.suffix in {".bicep", ".bicepparam", ".json"}
     )
-    assert "Microsoft.Authorization/roleAssignments" not in all_iac
     assert not re.search(
         r"(?i)(password|clientSecret|accessKey|privateKey)\s*=\s*['\"][^'\"]+['\"]",
         all_iac,
+    )
+
+
+def test_security_module_uses_only_approved_roles_and_exact_resource_scopes() -> None:
+    security = _read("infrastructure/bicep/modules/identity-rbac.bicep")
+    expected_role_ids = {
+        "7f951dda-4ed3-4680-a7ca-43fe172d538d",  # AcrPull
+        "ba92f5b4-2d11-453d-a403-e96b0029c9fe",  # Storage Blob Data Contributor
+        "b9a307c4-5aa3-4b52-ba60-2b17c136cd7b",  # Container Apps Jobs Operator
+    }
+    assert set(re.findall(r"'[0-9a-f-]{36}'", security)) == {
+        f"'{role_id}'" for role_id in expected_role_ids
+    }
+    assert "scope: registry" in security
+    assert "scope: rawContainer" in security
+    assert "scope: processedContainer" in security
+    assert "scope: curatedContainer" in security
+    assert "scope: quarantineContainer" in security
+    assert "scope: transformationJob" in security
+    assert "guid(" in security
+    for prohibited in ("AcrPush", "Owner", "User Access Administrator"):
+        assert prohibited not in security
+
+
+def test_security_wiring_remains_conditional_on_deferred_job() -> None:
+    composition = _read("infrastructure/bicep/main.bicep")
+    assert (
+        "module identityRbac 'modules/identity-rbac.bicep' = if (deployTransformationJob) {"
+        in composition
     )
 
 

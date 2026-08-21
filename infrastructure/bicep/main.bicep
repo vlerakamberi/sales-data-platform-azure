@@ -205,6 +205,22 @@ module postgresql 'modules/postgresql.bicep' = {
   }
 }
 
+module identityRbac 'modules/identity-rbac.bicep' = if (deployTransformationJob) {
+  name: 'identity-rbac-${environmentCode}'
+  scope: platformResourceGroup
+  params: {
+    transformationPrincipalId: transformationJob!.outputs.principalId
+    dataFactoryPrincipalId: dataFactory.outputs.principalId
+    registryName: registry.outputs.registryName
+    storageAccountName: storage.outputs.storageAccountName
+    rawContainerName: storage.outputs.rawContainerName
+    processedContainerName: storage.outputs.processedContainerName
+    curatedContainerName: storage.outputs.curatedContainerName
+    quarantineContainerName: storage.outputs.quarantineContainerName
+    transformationJobName: transformationJob!.outputs.jobName
+  }
+}
+
 output environmentName string = environment
 output environmentResourceGroupName string = platformResourceGroup.name
 output storageAccountId string = storage.outputs.storageAccountId
