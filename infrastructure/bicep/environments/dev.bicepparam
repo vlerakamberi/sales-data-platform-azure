@@ -1,7 +1,7 @@
 using '../main.bicep'
 
 param environment = 'development'
-param location = 'northeurope'
+param location = 'francecentral'
 param namingPrefix = 'nsrsdp'
 param governanceTags = {
   costOwner: 'data-engineering'
