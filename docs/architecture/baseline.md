@@ -34,5 +34,7 @@ dependency. Repositories 3 and 4, dimensional warehousing, and BI are outside th
 Unit 2 supplies declarative Bicep definitions for the approved resource boundaries. It does not
 provision them. Unit 3 supplies the local deterministic transformation/Data Quality runtime and its
 container definition; no image has been built or pushed by repository governance, and no cloud job
-is enabled. ADF pipelines, ADLS integration, database schemas, detailed RBAC, application
-diagnostics, and all live Azure behavior require later authorization.
+is enabled. Unit 4 supplies only cloud-neutral data-layer metadata and deterministic logical
+addressing contracts; it neither accesses nor asserts the existence of ADLS objects. ADF pipelines,
+ADLS integration, database schemas, detailed RBAC, application diagnostics, and all live Azure
+behavior require later authorization.
