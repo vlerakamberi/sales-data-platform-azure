@@ -21,9 +21,13 @@ summary](docs/architecture/business-requirements.md), and [accepted ADRs](docs/a
 
 ## Current implementation status
 
-Unit 1 established the repository foundation. Unit 2 adds locally validated Bicep definitions for
-the approved Azure resource boundaries. Milestone 1 is not complete; Units 3–10 remain unimplemented,
-and no infrastructure deployment is authorized.
+Unit 1 established the repository foundation, and Unit 2 added locally validated Bicep definitions.
+Unit 3 adds an independently testable local sales transformation and Data Quality runtime plus a
+non-root container definition. Milestone 1 is not complete; Units 4–10 remain unimplemented, and no
+infrastructure deployment, cloud integration, or container image push has occurred.
+
+See the [Unit 3 runtime guide](docs/development/transformation-runtime.md) for its JSON contract,
+explicit `ACCEPTED`/`REJECTED`/`FAILED` semantics, local CLI, replay guarantees, and container use.
 
 ## Development setup (Windows PowerShell)
 
@@ -46,6 +50,7 @@ python -m ruff format --check .
 python -m pytest
 python -m pip check
 python -c "import sales_data_platform_azure"
+sdpa-transform --help
 ```
 
 Use `python -m ruff format .` to format locally. See the [development guide](docs/development/setup.md).

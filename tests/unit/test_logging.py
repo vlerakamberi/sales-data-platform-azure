@@ -53,3 +53,20 @@ def test_exception_is_serialized() -> None:
     except RuntimeError:
         logger.exception("failed safely")
     assert "RuntimeError: expected" in _last_record(stream)["exception"]
+
+
+def test_safe_runtime_metadata_is_serialized() -> None:
+    stream = io.StringIO()
+    logger = configure_logging(stream=stream)
+    logger.info(
+        "completed",
+        extra={
+            "stage": "quality_decision",
+            "outcome": "REJECTED",
+            "failed_expectation_ids": ("sales.quantity.positive",),
+        },
+    )
+    record = _last_record(stream)
+    assert record["stage"] == "quality_decision"
+    assert record["outcome"] == "REJECTED"
+    assert record["failed_expectation_ids"] == ["sales.quantity.positive"]

@@ -32,5 +32,7 @@ Repository 2 owns the Azure platform. Frozen Repository 1 is independent and is 
 dependency. Repositories 3 and 4, dimensional warehousing, and BI are outside this scope.
 
 Unit 2 supplies declarative Bicep definitions for the approved resource boundaries. It does not
-provision them. ADF pipelines, runnable transformation containers, database schemas, detailed RBAC,
-application diagnostics, and all live Azure behavior require later authorization.
+provision them. Unit 3 supplies the local deterministic transformation/Data Quality runtime and its
+container definition; no image has been built or pushed by repository governance, and no cloud job
+is enabled. ADF pipelines, ADLS integration, database schemas, detailed RBAC, application
+diagnostics, and all live Azure behavior require later authorization.

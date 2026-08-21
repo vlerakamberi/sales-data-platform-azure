@@ -11,6 +11,12 @@ from datetime import UTC, datetime
 
 _correlation_id: ContextVar[str | None] = ContextVar("correlation_id", default=None)
 _execution_id: ContextVar[str | None] = ContextVar("execution_id", default=None)
+_SAFE_RECORD_FIELDS = (
+    "stage",
+    "outcome",
+    "failure_classification",
+    "failed_expectation_ids",
+)
 
 
 class JsonFormatter(logging.Formatter):
@@ -29,6 +35,10 @@ class JsonFormatter(logging.Formatter):
             payload["correlation_id"] = correlation_id
         if execution_id:
             payload["execution_id"] = execution_id
+        for field in _SAFE_RECORD_FIELDS:
+            value = getattr(record, field, None)
+            if value is not None:
+                payload[field] = value
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
         return json.dumps(payload, separators=(",", ":"), sort_keys=True)
