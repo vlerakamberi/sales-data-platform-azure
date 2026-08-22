@@ -1,5 +1,24 @@
 # Identity and Access Boundaries
 
+## Unit 7 hybrid identity amendment
+
+Unit 7 intentionally separates private-image authentication from application data access. The
+development-only `nsrsdp-dev-transform-acr-pull-mi` user-assigned identity receives exactly
+AcrPull at the existing development ACR and no Storage, Key Vault, PostgreSQL, or broad management
+role. Preauthorization of this narrow identity makes first private-image provisioning deterministic
+without a public bootstrap image or stored registry credential.
+
+The transformation Job retains its system-assigned identity as the workload identity. That
+identity receives Storage Blob Data Contributor separately at raw, processed, curated, and
+quarantine container scope and receives no AcrPull. The Job attaches both identities, uses the UAMI
+resource ID only in registry authentication, and restricts main-container identity availability to
+the system identity. ADF-to-Job invocation remains outside Unit 7.
+
+The dedicated Unit 7 deployment graph references the Unit 6 ACR, Storage account and containers,
+and Container Apps environment as existing resources. PostgreSQL, ADF, Key Vault, Log Analytics,
+storage lifecycle, and other foundation resources are excluded. The older Unit 5 definitions below
+are historical foundation contracts; this amendment supersedes their ACR-pull principal for Unit 7.
+
 Status: **UNIT 5 DEFINITIONS ONLY — NOT DEPLOYED**
 
 This document defines environment-isolated workload identity, least-privilege RBAC, secret

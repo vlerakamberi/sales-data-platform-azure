@@ -9,6 +9,9 @@ WORKDIR /app
 RUN addgroup --system runtime && adduser --system --ingroup runtime runtime
 
 COPY --chown=runtime:runtime src/ /app/src/
+COPY --chown=runtime:runtime pyproject.toml README.md /app/
+
+RUN pip install --no-cache-dir .
 
 USER runtime
 

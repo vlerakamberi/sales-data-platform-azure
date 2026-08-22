@@ -174,6 +174,11 @@ module transformationJob 'modules/container-apps-job.bicep' = if (deployTransfor
     registryServer: registry.outputs.loginServer
     imageName: '${registry.outputs.loginServer}/${transformationImage}'
     environmentName: environment
+    storageAccountName: storage.outputs.storageAccountName
+    rawContainerName: storage.outputs.rawContainerName
+    processedContainerName: storage.outputs.processedContainerName
+    curatedContainerName: storage.outputs.curatedContainerName
+    quarantineContainerName: storage.outputs.quarantineContainerName
     cpu: jobCpu
     memory: jobMemory
     tags: standardTags
@@ -210,14 +215,11 @@ module identityRbac 'modules/identity-rbac.bicep' = if (deployTransformationJob)
   scope: platformResourceGroup
   params: {
     transformationPrincipalId: transformationJob!.outputs.principalId
-    dataFactoryPrincipalId: dataFactory.outputs.principalId
-    registryName: registry.outputs.registryName
     storageAccountName: storage.outputs.storageAccountName
     rawContainerName: storage.outputs.rawContainerName
     processedContainerName: storage.outputs.processedContainerName
     curatedContainerName: storage.outputs.curatedContainerName
     quarantineContainerName: storage.outputs.quarantineContainerName
-    transformationJobName: transformationJob!.outputs.jobName
   }
 }
 

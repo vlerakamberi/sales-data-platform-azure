@@ -10,7 +10,10 @@ readme = "README.md"
 requires-python = ">=3.13,<3.14"
 license = { text = "Proprietary" }
 authors = [{ name = "Northstar Retail Data Engineering" }]
-dependencies = []
+dependencies = [
+  "azure-identity>=1.24,<2",
+  "azure-storage-blob>=12.26,<13",
+]
 
 [project.scripts]
 sdpa-transform = "sales_data_platform_azure.transformation.cli:main"

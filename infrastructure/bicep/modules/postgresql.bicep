@@ -37,7 +37,7 @@ resource server 'Microsoft.DBforPostgreSQL/flexibleServers@2025-08-01' = {
       backupRetentionDays: backupRetentionDays
       geoRedundantBackup: geoRedundantBackup
     }
-    createMode: 'Create'
+    createMode: 'Default'
     dataEncryption: {
       type: 'SystemManaged'
     }
