@@ -1,0 +1,32 @@
+{
+  "name": "nsrsdp-dev-sales-schedule",
+  "properties": {
+    "description": "Stopped, low-frequency development schedule for governed raw objects.",
+    "annotations": ["development", "disabled-by-default", "cost-conscious"],
+    "runtimeState": "Stopped",
+    "pipelines": [
+      {
+        "pipelineReference": { "referenceName": "nsrsdp-dev-sales-orchestration", "type": "PipelineReference" },
+        "parameters": {
+          "dataset": "northstar-sales",
+          "partitionDate": "@formatDateTime(trigger().scheduledTime,'yyyy-MM-dd')",
+          "sourceId": "northstar-governed-landing",
+          "sourceObjectId": "@concat('northstar-sales-',formatDateTime(trigger().scheduledTime,'yyyy-MM-dd'))",
+          "inputBlob": "@concat('northstar-sales/partition_date=',formatDateTime(trigger().scheduledTime,'yyyy-MM-dd'),'/sales.json')",
+          "contractVersion": "1.0",
+          "subscriptionId": "{subscriptionId-injected-by-bicep}"
+        }
+      }
+    ],
+    "type": "ScheduleTrigger",
+    "typeProperties": {
+      "recurrence": {
+        "frequency": "Week",
+        "interval": 1,
+        "startTime": "2026-01-05T06:00:00Z",
+        "timeZone": "UTC",
+        "schedule": { "weekDays": ["Monday"], "hours": [6], "minutes": [0] }
+      }
+    }
+  }
+}

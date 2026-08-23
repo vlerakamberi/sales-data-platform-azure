@@ -11,7 +11,12 @@ def _read(relative_path: str) -> str:
 
 def test_exact_environment_parameter_files_are_distinct() -> None:
     parameter_files = {path.name for path in (BICEP_ROOT / "environments").glob("*.bicepparam")}
-    assert parameter_files == {"dev.bicepparam", "prod.bicepparam", "unit7-dev.bicepparam"}
+    assert parameter_files == {
+        "dev.bicepparam",
+        "prod.bicepparam",
+        "unit7-dev.bicepparam",
+        "unit8-dev.bicepparam",
+    }
 
     development = _read("infrastructure/bicep/environments/dev.bicepparam")
     production = _read("infrastructure/bicep/environments/prod.bicepparam")
@@ -22,6 +27,8 @@ def test_exact_environment_parameter_files_are_distinct() -> None:
 
 def test_expected_modules_are_composed() -> None:
     expected_modules = {
+        "adf-orchestration-rbac.bicep",
+        "adf-orchestration.bicep",
         "container-apps-environment.bicep",
         "container-apps-job.bicep",
         "acr-pull-identity.bicep",
@@ -37,7 +44,12 @@ def test_expected_modules_are_composed() -> None:
     assert actual_modules == expected_modules
 
     composition = _read("infrastructure/bicep/main.bicep")
-    for module_name in expected_modules - {"acr-pull-identity.bicep"}:
+    dedicated_graph_modules = {
+        "acr-pull-identity.bicep",
+        "adf-orchestration-rbac.bicep",
+        "adf-orchestration.bicep",
+    }
+    for module_name in expected_modules - dedicated_graph_modules:
         assert f"'modules/{module_name}'" in composition
 
 

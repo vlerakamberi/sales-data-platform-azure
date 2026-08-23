@@ -1,0 +1,154 @@
+{
+  "name": "nsrsdp-dev-sales-orchestration",
+  "properties": {
+    "description": "Development-only orchestration of the existing Unit 7 transformation Job.",
+    "parameters": {
+      "dataset": { "type": "string" },
+      "partitionDate": { "type": "string" },
+      "sourceId": { "type": "string" },
+      "sourceObjectId": { "type": "string" },
+      "inputBlob": { "type": "string" },
+      "contractVersion": { "type": "string" },
+      "subscriptionId": { "type": "string" }
+    },
+    "variables": {
+      "executionId": { "type": "String" },
+      "correlationId": { "type": "String" },
+      "containerAppsExecutionName": { "type": "String" },
+      "containerAppsExecutionStatus": { "type": "String", "defaultValue": "Pending" }
+    },
+    "activities": [
+      {
+        "name": "Validate governed raw landing",
+        "type": "IfCondition",
+        "dependsOn": [],
+        "userProperties": [
+          { "name": "rawObject", "value": "@pipeline().parameters.inputBlob" },
+          { "name": "maximumRetries", "value": "2" },
+          { "name": "retryIntervalSeconds", "value": "30" }
+        ],
+        "typeProperties": {
+          "expression": {
+            "type": "Expression",
+            "value": "@and(and(and(not(empty(pipeline().parameters.dataset)),not(empty(pipeline().parameters.partitionDate))),and(not(empty(pipeline().parameters.sourceId)),not(empty(pipeline().parameters.sourceObjectId)))),and(not(empty(pipeline().parameters.inputBlob)),not(empty(pipeline().parameters.contractVersion))))"
+          },
+          "ifTrueActivities": [],
+          "ifFalseActivities": [
+            {
+              "name": "Fail invalid governed raw landing contract",
+              "type": "Fail",
+              "dependsOn": [],
+              "typeProperties": {
+                "errorCode": "INVALID_RAW_LANDING_CONTRACT",
+                "message": "All governed raw landing identity parameters are required."
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Initialize execution identity",
+        "type": "SetVariable",
+        "dependsOn": [{ "activity": "Validate governed raw landing", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "variableName": "executionId",
+          "value": { "type": "Expression", "value": "@concat('unit8-adf-',pipeline().RunId)" }
+        }
+      },
+      {
+        "name": "Initialize correlation identity",
+        "type": "SetVariable",
+        "dependsOn": [{ "activity": "Initialize execution identity", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "variableName": "correlationId",
+          "value": { "type": "Expression", "value": "@pipeline().RunId" }
+        }
+      },
+      {
+        "name": "Start existing Container Apps transformation Job",
+        "type": "WebActivity",
+        "dependsOn": [{ "activity": "Initialize correlation identity", "dependencyConditions": ["Succeeded"] }],
+        "policy": { "timeout": "00:10:00", "retry": 0, "retryIntervalInSeconds": 30, "secureOutput": false, "secureInput": false },
+        "userProperties": [
+          { "name": "executionId", "value": "@variables('executionId')" },
+          { "name": "correlationId", "value": "@variables('correlationId')" },
+          { "name": "sourceObjectId", "value": "@pipeline().parameters.sourceObjectId" }
+        ],
+        "typeProperties": {
+          "method": "POST",
+          "httpRequestTimeout": "00:05:00",
+          "url": { "type": "Expression", "value": "@concat('https://management.azure.com/subscriptions/',pipeline().parameters.subscriptionId,'/resourceGroups/nsrsdp-dev-rg/providers/Microsoft.App/jobs/nsrsdp-dev-transform-job/start?api-version=2025-07-01')" },
+          "body": { "type": "Expression", "value": "@concat('{\"containers\":[{\"name\":\"transformation\",\"image\":\"nsrsdpdev2gndgslsp4a6cacr.azurecr.io/nsrsdp-dev-transformation:unit7-13cd4410b8e2\",\"resources\":{\"cpu\":0.5,\"memory\":\"1Gi\"},\"env\":[{\"name\":\"SDPA_ENVIRONMENT\",\"value\":\"development\"},{\"name\":\"SDPA_STORAGE_ACCOUNT_URL\",\"value\":\"https://nsrsdpdev2gndgslsp4a6cst.blob.core.windows.net\"},{\"name\":\"SDPA_RAW_CONTAINER\",\"value\":\"raw\"},{\"name\":\"SDPA_PROCESSED_CONTAINER\",\"value\":\"processed\"},{\"name\":\"SDPA_CURATED_CONTAINER\",\"value\":\"curated\"},{\"name\":\"SDPA_QUARANTINE_CONTAINER\",\"value\":\"quarantine\"}],\"args\":[\"--input-blob\",\"',pipeline().parameters.inputBlob,'\",\"--dataset\",\"',pipeline().parameters.dataset,'\",\"--partition-date\",\"',pipeline().parameters.partitionDate,'\",\"--source-id\",\"',pipeline().parameters.sourceId,'\",\"--source-object-id\",\"',pipeline().parameters.sourceObjectId,'\",\"--execution-id\",\"',variables('executionId'),'\",\"--correlation-id\",\"',variables('correlationId'),'\",\"--contract-version\",\"',pipeline().parameters.contractVersion,'\"]}]}')" },
+          "authentication": { "type": "MSI", "resource": "https://management.azure.com/" }
+        }
+      },
+      {
+        "name": "Capture Container Apps execution identity",
+        "type": "SetVariable",
+        "dependsOn": [{ "activity": "Start existing Container Apps transformation Job", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "variableName": "containerAppsExecutionName",
+          "value": { "type": "Expression", "value": "@activity('Start existing Container Apps transformation Job').output.name" }
+        }
+      },
+      {
+        "name": "Poll managed Job execution to terminal state",
+        "type": "Until",
+        "dependsOn": [{ "activity": "Capture Container Apps execution identity", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "expression": { "type": "Expression", "value": "@or(equals(variables('containerAppsExecutionStatus'),'Succeeded'),equals(variables('containerAppsExecutionStatus'),'Failed'))" },
+          "timeout": "0.00:25:00",
+          "activities": [
+            {
+              "name": "Wait before execution status read",
+              "type": "Wait",
+              "dependsOn": [],
+              "typeProperties": { "waitTimeInSeconds": 15 }
+            },
+            {
+              "name": "Read Container Apps execution status",
+              "type": "WebActivity",
+              "dependsOn": [{ "activity": "Wait before execution status read", "dependencyConditions": ["Succeeded"] }],
+              "policy": { "timeout": "0.00:01:00", "retry": 2, "retryIntervalInSeconds": 30, "secureOutput": false, "secureInput": false },
+              "typeProperties": {
+                "method": "GET",
+                "url": { "type": "Expression", "value": "@concat('https://management.azure.com/subscriptions/',pipeline().parameters.subscriptionId,'/resourceGroups/nsrsdp-dev-rg/providers/Microsoft.App/jobs/nsrsdp-dev-transform-job/executions/',variables('containerAppsExecutionName'),'?api-version=2025-07-01')" },
+                "authentication": { "type": "MSI", "resource": "https://management.azure.com/" }
+              }
+            },
+            {
+              "name": "Capture Container Apps execution status",
+              "type": "SetVariable",
+              "dependsOn": [{ "activity": "Read Container Apps execution status", "dependencyConditions": ["Succeeded"] }],
+              "typeProperties": {
+                "variableName": "containerAppsExecutionStatus",
+                "value": { "type": "Expression", "value": "@activity('Read Container Apps execution status').output.properties.status" }
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "Propagate terminal Job outcome",
+        "type": "IfCondition",
+        "dependsOn": [{ "activity": "Poll managed Job execution to terminal state", "dependencyConditions": ["Succeeded"] }],
+        "typeProperties": {
+          "expression": { "type": "Expression", "value": "@equals(variables('containerAppsExecutionStatus'),'Succeeded')" },
+          "ifTrueActivities": [],
+          "ifFalseActivities": [
+            {
+              "name": "Fail orchestration for technical Job failure",
+              "type": "Fail",
+              "dependsOn": [],
+              "typeProperties": {
+                "errorCode": "CONTAINER_APPS_JOB_FAILED",
+                "message": { "type": "Expression", "value": "@concat('Container Apps execution ',variables('containerAppsExecutionName'),' reached terminal state ',variables('containerAppsExecutionStatus'),'.')" }
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "annotations": ["development", "governed-orchestration", "rejected-is-success"]
+  }
+}
