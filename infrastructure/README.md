@@ -10,8 +10,8 @@ must not be assumed to exist.
 
 - `bicep/main.bicep` is the subscription-scoped composition. It declares one environment-specific
   resource group and composes all bounded modules.
-- `bicep/environments/dev.bicepparam` and `prod.bicepparam` are the only environments. They contain
-  non-secret capacity, retention, location, naming, and tag values.
+- `bicep/environments/dev.bicepparam` and `prod.bicepparam` define the foundation environments.
+  Unit-specific development overlays contain only their bounded non-secret parameters.
 - `storage.bicep` defines secure ADLS Gen2 storage and raw, processed, curated, and quarantine
   containers. Raw data is cooled but never lifecycle-deleted; derived data retention is configurable.
 - `data-factory.bicep` defines ADF with a system-assigned identity, but no pipelines or activities.
@@ -23,6 +23,9 @@ must not be assumed to exist.
   environment parameter files.
 - `key-vault.bicep` defines an RBAC-ready, purge-protected vault containing no secrets.
 - `postgresql.bicep` defines an Entra-only, bounded PostgreSQL Flexible Server with no schemas or data.
+- `unit9-private-network.bicep` composes the development-only private network, PostgreSQL Private
+  Endpoint/DNS, and future replacement network-capable Container Apps Environment. It references
+  the existing PostgreSQL server and Log Analytics workspace and performs no Job cutover.
 
 ## Prerequisites and local validation
 

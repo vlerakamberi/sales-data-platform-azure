@@ -16,6 +16,7 @@ def test_exact_environment_parameter_files_are_distinct() -> None:
         "prod.bicepparam",
         "unit7-dev.bicepparam",
         "unit8-dev.bicepparam",
+        "unit9-dev.bicepparam",
     }
 
     development = _read("infrastructure/bicep/environments/dev.bicepparam")
@@ -38,7 +39,10 @@ def test_expected_modules_are_composed() -> None:
         "identity-rbac.bicep",
         "monitoring.bicep",
         "postgresql.bicep",
+        "postgresql-private-connectivity.bicep",
         "storage.bicep",
+        "network-capable-container-apps-environment.bicep",
+        "unit9-development-network.bicep",
     }
     actual_modules = {path.name for path in (BICEP_ROOT / "modules").glob("*.bicep")}
     assert actual_modules == expected_modules
@@ -49,7 +53,12 @@ def test_expected_modules_are_composed() -> None:
         "adf-orchestration-rbac.bicep",
         "adf-orchestration.bicep",
     }
-    for module_name in expected_modules - dedicated_graph_modules:
+    unit9_modules = {
+        "network-capable-container-apps-environment.bicep",
+        "postgresql-private-connectivity.bicep",
+        "unit9-development-network.bicep",
+    }
+    for module_name in expected_modules - dedicated_graph_modules - unit9_modules:
         assert f"'modules/{module_name}'" in composition
 
 
