@@ -7,6 +7,6 @@ The Repository 2 ADR set is approved:
 - [ADR-003 — Cloud Identity and Secret Management](003-identity-and-secrets.md)
 - [ADR-004 — Relational Serving Platform](004-relational-serving.md)
 - [ADR-005 — Transformation Execution Boundary](005-transformation-execution.md)
+- [ADR-006 — Relational Serving and Operational Observability Architecture](006-relational-serving-operational-observability.md)
 
-No additional architecture decision is introduced by Unit 1.
-
+ADR-006 records the approved Unit 9 relational-serving and observability boundary.

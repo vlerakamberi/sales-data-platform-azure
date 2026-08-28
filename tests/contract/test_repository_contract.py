@@ -17,6 +17,7 @@ def test_required_repository_boundaries_exist() -> None:
         "orchestration/adf",
         "scripts",
         "sql/migrations",
+        "src/sales_data_platform_azure/relational",
         "tests/integration",
     }
     assert not [path for path in required if not (ROOT / path).is_dir()]

@@ -1,5 +1,6 @@
 """Environment-driven application configuration."""
 
+from .postgresql import PostgreSQLSettings
 from .security import (
     ApprovedRole,
     KeyVaultSecretReference,
@@ -18,6 +19,7 @@ __all__ = [
     "ConfigurationError",
     "KeyVaultSecretReference",
     "ManagedIdentityType",
+    "PostgreSQLSettings",
     "ResourceScope",
     "ResourceType",
     "RoleRelationship",
