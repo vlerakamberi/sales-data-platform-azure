@@ -20,6 +20,7 @@ from sales_data_platform_azure.contracts import (
     TransformationResult,
 )
 from sales_data_platform_azure.logging import configure_logging
+from sales_data_platform_azure.relational import RelationalServingService
 
 from .managed import AzureBlobStore, ManagedExecutionRequest, execute_managed
 from .runtime import transform_sales_batch
@@ -33,6 +34,7 @@ def main(
     stdin: TextIO | None = None,
     stdout: TextIO | None = None,
     stderr: TextIO | None = None,
+    relational_serving: RelationalServingService | None = None,
 ) -> int:
     """Execute one request and return 0 for governed outcomes, 2 for execution failures."""
     input_stream = sys.stdin if stdin is None else stdin
@@ -44,7 +46,9 @@ def main(
     configure_logging(arguments.log_level, stream=error_stream)
 
     if arguments.input_blob:
-        result = _execute_cloud(arguments, execution_id, correlation_id)
+        result = _execute_cloud(
+            arguments, execution_id, correlation_id, relational_serving=relational_serving
+        )
     else:
         result = _execute_local(arguments, input_stream, execution_id, correlation_id)
 
@@ -80,7 +84,13 @@ def _execute_local(arguments, input_stream, execution_id, correlation_id):
     return result
 
 
-def _execute_cloud(arguments, execution_id: str, correlation_id: str) -> TransformationResult:
+def _execute_cloud(
+    arguments,
+    execution_id: str,
+    correlation_id: str,
+    *,
+    relational_serving: RelationalServingService | None = None,
+) -> TransformationResult:
     required = {
         "storage account URL": arguments.storage_account_url,
         "dataset": arguments.dataset,
@@ -130,7 +140,7 @@ def _execute_cloud(arguments, execution_id: str, correlation_id: str) -> Transfo
             failure_classification=FailureClassification.INVALID_CONFIGURATION,
             diagnostic="managed execution configuration is invalid",
         )
-    return execute_managed(request, store)
+    return execute_managed(request, store, relational_serving)
 
 
 def _source_identity(payload: str) -> SourceIdentity:

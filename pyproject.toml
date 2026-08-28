@@ -13,6 +13,7 @@ authors = [{ name = "Northstar Retail Data Engineering" }]
 dependencies = [
   "azure-identity>=1.24,<2",
   "azure-storage-blob>=12.26,<13",
+  "psycopg[binary]>=3.2,<4",
 ]
 
 [project.scripts]

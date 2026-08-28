@@ -14,6 +14,7 @@ class PostgreSQLSettings:
 
     host: str
     database: str
+    user: str
     port: int = 5432
     sslmode: str = "require"
     managed_identity_client_id: str | None = None
@@ -28,6 +29,7 @@ class PostgreSQLSettings:
         settings = cls(
             host=environ.get("SDPA_POSTGRESQL_HOST", "").strip(),
             database=environ.get("SDPA_POSTGRESQL_DATABASE", "").strip(),
+            user=environ.get("SDPA_POSTGRESQL_USER", "").strip(),
             port=port,
             sslmode=environ.get("SDPA_POSTGRESQL_SSLMODE", "require").strip().lower(),
             managed_identity_client_id=(
@@ -39,8 +41,8 @@ class PostgreSQLSettings:
 
     def validate(self, environ: Mapping[str, str] | None = None) -> None:
         """Reject incomplete, unsafe, or password-bearing configuration."""
-        if not self.host or not self.database:
-            raise ConfigurationError("PostgreSQL host and database must not be empty")
+        if not self.host or not self.database or not self.user:
+            raise ConfigurationError("PostgreSQL host, database, and user must not be empty")
         if not 1 <= self.port <= 65535:
             raise ConfigurationError("PostgreSQL port must be between 1 and 65535")
         if self.sslmode not in {"require", "verify-ca", "verify-full"}:

@@ -12,9 +12,18 @@ from datetime import UTC, datetime
 _correlation_id: ContextVar[str | None] = ContextVar("correlation_id", default=None)
 _execution_id: ContextVar[str | None] = ContextVar("execution_id", default=None)
 _SAFE_RECORD_FIELDS = (
+    "event",
     "stage",
     "outcome",
+    "environment",
+    "dataset",
+    "transaction_id",
+    "source_id",
+    "source_object_id",
+    "attempt_id",
+    "persistence_outcome",
     "failure_classification",
+    "diagnostic_category",
     "failed_expectation_ids",
 )
 

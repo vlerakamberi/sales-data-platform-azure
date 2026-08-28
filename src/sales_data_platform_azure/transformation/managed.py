@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import json
 import logging
+import uuid
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from typing import Protocol
@@ -14,6 +16,7 @@ from sales_data_platform_azure.contracts import (
     ProcessingOutcome,
     TransformationResult,
 )
+from sales_data_platform_azure.relational import RelationalServingError, RelationalServingService
 from sales_data_platform_azure.storage import (
     DataLayer,
     PathRequest,
@@ -68,7 +71,13 @@ class AzureBlobStore:
         )
 
 
-def execute_managed(request: ManagedExecutionRequest, store: BlobStore) -> TransformationResult:
+def execute_managed(
+    request: ManagedExecutionRequest,
+    store: BlobStore,
+    relational_serving: RelationalServingService | None = None,
+    *,
+    attempt_id_factory: Callable[[], str] | None = None,
+) -> TransformationResult:
     """Read immutable raw input and persist governed outputs without mutating raw."""
     try:
         payload = store.download_text(request.raw_container, request.input_blob)
@@ -101,6 +110,24 @@ def execute_managed(request: ManagedExecutionRequest, store: BlobStore) -> Trans
             else request.curated_container
         )
         store.upload_text(destination_container, destination.location.address, serialized_records)
+        if result.outcome is ProcessingOutcome.ACCEPTED and relational_serving is not None:
+            attempt_id = (attempt_id_factory or _new_attempt_id)()
+            try:
+                relational_serving.serve(
+                    result,
+                    environment=request.environment.value,
+                    dataset=request.dataset,
+                    attempt_id=attempt_id,
+                )
+            except RelationalServingError:
+                return TransformationResult(
+                    execution_id=result.execution_id,
+                    correlation_id=result.correlation_id,
+                    source=result.source,
+                    outcome=ProcessingOutcome.FAILED,
+                    failure_classification=FailureClassification.RELATIONAL_SERVING_FAILED,
+                    diagnostic="relational serving failed",
+                )
         _LOGGER.info(
             "managed storage persistence completed",
             extra={"stage": "persistence", "outcome": result.outcome.value},
@@ -123,3 +150,7 @@ def execute_managed(request: ManagedExecutionRequest, store: BlobStore) -> Trans
             failure_classification=FailureClassification.UNEXPECTED_RUNTIME,
             diagnostic="managed storage execution failed",
         )
+
+
+def _new_attempt_id() -> str:
+    return f"serving-{uuid.uuid4()}"

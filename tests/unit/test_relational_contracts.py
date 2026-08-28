@@ -48,6 +48,7 @@ def test_postgresql_configuration_is_encrypted_and_password_free() -> None:
         {
             "SDPA_POSTGRESQL_HOST": "private.example.postgres.database.azure.com",
             "SDPA_POSTGRESQL_DATABASE": "sales",
+            "SDPA_POSTGRESQL_USER": "serving-job",
             "SDPA_POSTGRESQL_SSLMODE": "verify-full",
         }
     )
@@ -59,6 +60,7 @@ def test_postgresql_configuration_is_encrypted_and_password_free() -> None:
             {
                 "SDPA_POSTGRESQL_HOST": "private.example",
                 "SDPA_POSTGRESQL_DATABASE": "sales",
+                "SDPA_POSTGRESQL_USER": "serving-job",
                 "PGPASSWORD": "prohibited",
             }
         )

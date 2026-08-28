@@ -2,14 +2,24 @@
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from collections.abc import Mapping, Sequence
+from typing import Any, Protocol, runtime_checkable
 
 from sales_data_platform_azure.config import PostgreSQLSettings
 
 
 @runtime_checkable
 class RelationalConnection(Protocol):
-    """Opaque connection marker implemented by a future database adapter."""
+    """Minimal explicit-transaction connection used by the serving repository."""
+
+    def execute(self, query: str, params: Sequence[Any] | Mapping[str, Any] = ()) -> object:
+        """Execute one parameterized statement."""
+
+    def commit(self) -> None:
+        """Atomically commit all serving writes."""
+
+    def rollback(self) -> None:
+        """Discard all writes from the failed serving attempt."""
 
     def close(self) -> None:
         """Release the future adapter connection."""

@@ -6,6 +6,7 @@ from sales_data_platform_azure.contracts import (
     ProcessingOutcome,
     SourceIdentity,
 )
+from sales_data_platform_azure.relational import RelationalServingError
 from sales_data_platform_azure.storage import StorageEnvironment
 from sales_data_platform_azure.transformation.managed import (
     ManagedExecutionRequest,
@@ -30,6 +31,17 @@ class MemoryBlobStore:
         if self.fail_upload:
             raise OSError("simulated storage failure")
         self.uploads.append((container, object_name, content))
+
+
+class ServingSpy:
+    def __init__(self, *, fail: bool = False) -> None:
+        self.fail = fail
+        self.calls: list[tuple[object, str, str, str]] = []
+
+    def serve(self, result, *, environment: str, dataset: str, attempt_id: str):
+        self.calls.append((result, environment, dataset, attempt_id))
+        if self.fail:
+            raise RelationalServingError("safe failure")
 
 
 def _payload(quantity: int = 1) -> str:
@@ -109,3 +121,40 @@ def test_storage_failure_is_safe_failed_execution() -> None:
     assert result.outcome is ProcessingOutcome.FAILED
     assert result.artifact is None
     assert result.diagnostic == "managed storage execution failed"
+
+
+def test_only_accepted_managed_result_invokes_relational_serving() -> None:
+    accepted_spy = ServingSpy()
+    accepted = execute_managed(
+        _request("accepted"),
+        MemoryBlobStore(_payload()),
+        accepted_spy,
+        attempt_id_factory=lambda: "attempt-accepted",
+    )
+    assert accepted.outcome is ProcessingOutcome.ACCEPTED
+    assert len(accepted_spy.calls) == 1
+    assert accepted_spy.calls[0][1:] == ("dev", "sales", "attempt-accepted")
+
+    rejected_spy = ServingSpy()
+    rejected = execute_managed(_request("rejected"), MemoryBlobStore(_payload(0)), rejected_spy)
+    assert rejected.outcome is ProcessingOutcome.REJECTED
+    assert rejected_spy.calls == []
+
+    failed_spy = ServingSpy()
+    failed = execute_managed(_request("failed"), MemoryBlobStore("not-json"), failed_spy)
+    assert failed.outcome is ProcessingOutcome.FAILED
+    assert failed_spy.calls == []
+
+
+def test_relational_failure_uses_inherited_technical_failure_path() -> None:
+    spy = ServingSpy(fail=True)
+    result = execute_managed(
+        _request("run-failed"),
+        MemoryBlobStore(_payload()),
+        spy,
+        attempt_id_factory=lambda: "attempt-failed",
+    )
+
+    assert result.outcome is ProcessingOutcome.FAILED
+    assert result.failure_classification.value == "RELATIONAL_SERVING_FAILED"
+    assert result.diagnostic == "relational serving failed"

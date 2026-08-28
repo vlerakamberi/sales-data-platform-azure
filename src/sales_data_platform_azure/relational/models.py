@@ -50,6 +50,14 @@ class ServingLineage:
     attempt: ServingAttempt
 
 
+@dataclass(frozen=True, slots=True)
+class PersistenceResult:
+    """Safe result of one atomically committed relational serving attempt."""
+
+    attempt: ServingAttempt
+    business_identities: tuple[BusinessIdentity, ...]
+
+
 def is_serving_eligible(outcome: ProcessingOutcome) -> bool:
     """Only governed accepted transformation results may enter normal serving persistence."""
     return outcome is ProcessingOutcome.ACCEPTED
