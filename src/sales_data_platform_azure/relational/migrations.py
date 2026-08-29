@@ -6,6 +6,7 @@ import re
 from collections.abc import Iterable
 from dataclasses import dataclass
 from datetime import datetime
+from hashlib import sha256
 from pathlib import Path
 
 _MIGRATION_NAME = re.compile(
@@ -45,6 +46,14 @@ class AppliedMigration:
     applied_at: datetime
 
 
+@dataclass(frozen=True, slots=True)
+class MigrationState:
+    """Validated database history and the deterministic migrations still to apply."""
+
+    applied: tuple[AppliedMigration, ...]
+    pending: tuple[Migration, ...]
+
+
 def discover_migrations(directory: Path) -> tuple[Migration, ...]:
     """Discover valid SQL migrations in strict version order and reject duplicates."""
     migrations = sorted(Migration.from_path(path) for path in directory.glob("V*.sql"))
@@ -53,6 +62,37 @@ def discover_migrations(directory: Path) -> tuple[Migration, ...]:
     if duplicates:
         raise MigrationError(f"duplicate migration versions: {duplicates}")
     return tuple(migrations)
+
+
+def migration_checksum(migration: Migration) -> str:
+    """Return the stable SHA-256 identity of one immutable migration file."""
+    return sha256(migration.path.read_bytes()).hexdigest()
+
+
+def inspect_migration_state(
+    available: Iterable[Migration], applied: Iterable[AppliedMigration]
+) -> MigrationState:
+    """Validate complete history identity and reject unknown or partially applied state."""
+    ordered = tuple(sorted(available))
+    history = tuple(sorted(applied, key=lambda migration: migration.version))
+    by_version = {migration.version: migration for migration in ordered}
+    unknown = sorted(recorded.version for recorded in history if recorded.version not in by_version)
+    if unknown:
+        raise MigrationError(f"history contains unknown migration versions: {unknown}")
+    pending = pending_migrations(ordered, history)
+
+    for recorded in history:
+        migration = by_version[recorded.version]
+        if recorded.description != migration.description:
+            raise MigrationError(f"history description mismatch at version {recorded.version}")
+        if recorded.checksum != migration_checksum(migration):
+            raise MigrationError(f"history checksum mismatch at version {recorded.version}")
+
+    expected_prefix = tuple(migration.version for migration in ordered[: len(history)])
+    recorded_versions = tuple(migration.version for migration in history)
+    if recorded_versions != expected_prefix:
+        raise MigrationError("migration history is partial or contains a version gap")
+    return MigrationState(history, pending)
 
 
 def pending_migrations(
