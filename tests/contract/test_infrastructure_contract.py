@@ -17,6 +17,7 @@ def test_exact_environment_parameter_files_are_distinct() -> None:
         "unit7-dev.bicepparam",
         "unit8-dev.bicepparam",
         "unit9-dev.bicepparam",
+        "unit9-migration-dev.bicepparam",
     }
 
     development = _read("infrastructure/bicep/environments/dev.bicepparam")
