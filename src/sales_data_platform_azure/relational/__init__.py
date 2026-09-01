@@ -18,11 +18,16 @@ from .models import (
     is_serving_eligible,
 )
 from .repository import PostgreSQLServingRepository, RelationalServingError
+from .runtime import (
+    ManagedIdentityPostgreSQLCredentialProvider,
+    build_relational_serving_service,
+)
 from .service import RelationalServingService, ServingRepository
 
 __all__ = [
     "AppliedMigration",
     "BusinessIdentity",
+    "ManagedIdentityPostgreSQLCredentialProvider",
     "Migration",
     "MigrationError",
     "PersistenceOutcome",
@@ -37,6 +42,7 @@ __all__ = [
     "ServingAttempt",
     "ServingLineage",
     "ServingRepository",
+    "build_relational_serving_service",
     "discover_migrations",
     "is_serving_eligible",
     "pending_migrations",

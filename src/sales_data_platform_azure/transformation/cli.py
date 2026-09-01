@@ -12,6 +12,7 @@ from datetime import date
 from pathlib import Path
 from typing import TextIO
 
+from sales_data_platform_azure.config import ConfigurationError
 from sales_data_platform_azure.contracts import (
     ExecutionContext,
     FailureClassification,
@@ -20,7 +21,10 @@ from sales_data_platform_azure.contracts import (
     TransformationResult,
 )
 from sales_data_platform_azure.logging import configure_logging
-from sales_data_platform_azure.relational import RelationalServingService
+from sales_data_platform_azure.relational import (
+    RelationalServingService,
+    build_relational_serving_service,
+)
 
 from .managed import AzureBlobStore, ManagedExecutionRequest, execute_managed
 from .runtime import transform_sales_batch
@@ -131,7 +135,8 @@ def _execute_cloud(
             context=ExecutionContext(execution_id, correlation_id, source),
         )
         store = AzureBlobStore(arguments.storage_account_url)
-    except (TypeError, ValueError):
+        serving = relational_serving or build_relational_serving_service(os.environ)
+    except (ConfigurationError, TypeError, ValueError):
         return TransformationResult(
             execution_id=execution_id,
             correlation_id=correlation_id,
@@ -140,7 +145,7 @@ def _execute_cloud(
             failure_classification=FailureClassification.INVALID_CONFIGURATION,
             diagnostic="managed execution configuration is invalid",
         )
-    return execute_managed(request, store, relational_serving)
+    return execute_managed(request, store, serving)
 
 
 def _source_identity(payload: str) -> SourceIdentity:
