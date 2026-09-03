@@ -27,7 +27,7 @@ from .postgresql_activation import (
 )
 
 APPROVED_BOOTSTRAP_IDENTITY_NAME = "Vlera Kamberi"
-APPROVED_BOOTSTRAP_OBJECT_ID = "19ec5eb3-0ae2-4e79-bdf1-9d9f9f905313"
+APPROVED_BOOTSTRAP_OBJECT_ID = "19ec5eb3-0ae2-4e79-bdf1-4e9d9f905313"
 APPROVED_BOOTSTRAP_POSTGRESQL_USERNAME = "vkamberi97_gmail.com#EXT#@vkamberi97gmail.onmicrosoft.com"
 APPROVED_WORKLOAD_IDENTITY_NAME = "nsrsdp-dev-postgres-serving-mi"
 APPROVED_WORKLOAD_OBJECT_ID = "f2a0d95f-c321-4e91-9704-3415e2658a6f"

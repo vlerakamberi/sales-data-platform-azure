@@ -68,3 +68,37 @@ Never commit secrets or shared production credentials. `.env` and common credent
 are ignored; `.env.example` contains safe, non-secret examples only. Later Azure implementation
 must prefer Entra ID and managed identities, use least-privilege RBAC, and use Key Vault only
 when a secret is unavoidable. See the [security baseline](docs/security/baseline.md).
+
+## Milestone 1 integrated validation
+
+Repository 2 Milestone 1 ? **Cloud Data Platform Foundation** ? has completed its integrated Unit 10
+implementation and evidence collection and is awaiting final Governance implementation review and
+Git closure.
+
+Validated development-platform evidence includes:
+
+- Azure Data Factory orchestration of the governed Container Apps Job;
+- raw ? processed ? curated ADLS progression;
+- deterministic replay/idempotency behavior;
+- real failure ? diagnosis ? corrected recovery evidence;
+- operational traceability across ADF and Container Apps execution history;
+- PostgreSQL private infrastructure and private TCP reachability;
+- Entra-only PostgreSQL configuration with public access and password authentication disabled;
+- final removal of the temporary human ADLS validation role;
+- SHIR retained in the deallocated state after validation.
+
+Two limitations remain explicitly governed rather than hidden:
+
+1. **Unit 9.6:** Microsoft Entra Windows sign-in replacement remediation is deferred because the
+   Azure for Students Poland Central regional vCPU quota prevented provisioning the approved
+   Desktop Experience replacement VM.
+2. **PostgreSQL live serving:** authenticated bootstrap/migration/serving acceptance is formally
+   deferred because the current governed environment has no compliant human private bootstrap
+   execution surface without disproportionate access/guest expansion.
+
+Neither limitation is represented as PASS or as an architecture failure.
+
+Detailed validation evidence and explicit non-claims are recorded in
+[`docs/operations/milestone1-validation.md`](docs/operations/milestone1-validation.md).
+
+<!-- UNIT10_MILESTONE1_CLOSURE -->

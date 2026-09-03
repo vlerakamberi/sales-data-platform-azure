@@ -38,3 +38,33 @@ is enabled. Unit 4 supplies only cloud-neutral data-layer metadata and determini
 addressing contracts; it neither accesses nor asserts the existence of ADLS objects. ADF pipelines,
 ADLS integration, database schemas, detailed RBAC, application diagnostics, and all live Azure
 behavior require later authorization.
+
+## Milestone 1 deployed-state reconciliation
+
+The earlier sections preserve the design-stage baseline. Unit 10 adds the following authoritative
+deployed-state reconciliation.
+
+The development platform has now demonstrated a governed Northstar path through Azure Data Factory,
+the existing Container Apps Job, deterministic transformation/Data Quality behavior, and the raw,
+processed and curated ADLS boundaries.
+
+ADF successfully invoked the managed Container Apps execution boundary without relying on SHIR for
+the validated Northstar path. Replay retained deterministic accepted-output addressing, and a real
+failed invocation was diagnosed and followed by a successful corrected execution.
+
+PostgreSQL remains the approved bounded relational serving platform. Its deployed private
+infrastructure, Entra-only configuration, Private Endpoint and private network reachability were
+validated. Live authenticated serving activation was not executed and is formally deferred because
+the governed environment does not currently provide a compliant human private bootstrap execution
+surface without disproportionate access/guest expansion.
+
+The separate Unit 9.6 Microsoft Entra Windows sign-in remediation also remains deferred because the
+approved replacement VM could not be provisioned within the Azure for Students regional vCPU quota.
+
+Neither governed limitation changes the architectural decision that ADLS is the durable source and
+replay boundary and PostgreSQL is only a bounded relational serving projection.
+
+See [`../operations/milestone1-validation.md`](../operations/milestone1-validation.md) for the
+integrated validation evidence and explicit unvalidated claims.
+
+<!-- UNIT10_MILESTONE1_CLOSURE -->
