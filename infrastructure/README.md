@@ -1,10 +1,11 @@
 # Azure Infrastructure Definition
 
-> **INFRASTRUCTURE DEFINED — NOT PROVISIONED**
+> **MILESTONE 1 COMPLETE AND VALIDATED — DEVELOPMENT PROVISIONED; PRODUCTION DEFINITION-ONLY**
 
-Unit 2 represents the approved Milestone 1 infrastructure in Bicep. The files are local,
-declarative definitions only. No Azure deployment has occurred and the resources described here
-must not be assumed to exist.
+Unit 2 originally established the approved Milestone 1 infrastructure definitions. Later governed
+units used the development-specific definitions and overlays to provision and validate the supported
+development foundation recorded in the Milestone 1 evidence. The production parameterization remains
+definition-only, and no production deployment is claimed.
 
 ## Structure and responsibilities
 

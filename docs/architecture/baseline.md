@@ -1,6 +1,10 @@
 # Approved Architecture Baseline
 
-Status: **APPROVED / INFRASTRUCTURE DEFINED — NOT PROVISIONED**
+Status: **APPROVED / MILESTONE 1 COMPLETE AND VALIDATED**
+
+The original design-stage boundaries below are retained as historical implementation context. The
+authoritative present state is the deployed-state reconciliation later in this document: supported
+development infrastructure was provisioned and validated, while production remains definition-only.
 
 ## Target flow and boundaries
 

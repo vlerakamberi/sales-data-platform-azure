@@ -12,22 +12,22 @@ transformation, a distinct data-quality boundary, and Azure Database for Postgre
 serving layer. Entra ID, managed identities, least-privilege RBAC, and Key Vault form the identity
 and secret hierarchy. Azure Monitor and Log Analytics are the later observability direction.
 
-These components describe approved architecture. **Infrastructure is defined but not provisioned.**
-No Azure resource currently exists as a result of this repository. Development and production are
-represented as isolated parameterized environments; replay will begin from the durable raw boundary.
+These components describe the implemented architecture. Repository 2 and Milestone 1 are
+**COMPLETE AND VALIDATED**. The governed development Azure foundation was provisioned and validated
+where recorded in the Milestone 1 evidence; production remains definition-only. Development and
+production are represented as isolated parameterized environments, and replay begins from the
+durable raw boundary.
 
 See the [architecture baseline](docs/architecture/baseline.md), [business requirements
 summary](docs/architecture/business-requirements.md), and [accepted ADRs](docs/adr/README.md).
 
 ## Current implementation status
 
-Unit 1 established the repository foundation, and Unit 2 added locally validated Bicep definitions.
-Unit 3 adds an independently testable local sales transformation and Data Quality runtime plus a
-non-root container definition. Unit 4 adds cloud-neutral contracts for deterministic raw,
-processed, curated, and quarantine object addressing without an Azure client or cloud access. Unit
-5 defines environment-isolated system identities, bounded RBAC-as-code, and secret-free security
-contracts without deployment. Milestone 1 is not complete; Units 6–10 remain unimplemented, and no
-infrastructure deployment, cloud integration, or container image push has occurred.
+Units 1–5 established the repository, Bicep, transformation/Data Quality, data-layer, and security
+foundations. Units 6–10 added the governed development deployment, managed container execution,
+ADF orchestration, private PostgreSQL architecture and activation mechanisms, and integrated
+validation evidence. The tracked implementation and evidence preserve the exact boundaries between
+locally tested mechanisms, validated development Azure behavior, and formally deferred acceptance.
 
 See the [Unit 3 runtime guide](docs/development/transformation-runtime.md) for its JSON contract,
 explicit `ACCEPTED`/`REJECTED`/`FAILED` semantics, local CLI, replay guarantees, and container use.
@@ -65,15 +65,15 @@ Use `python -m ruff format .` to format locally. See the [development guide](doc
 ## Security
 
 Never commit secrets or shared production credentials. `.env` and common credential artifacts
-are ignored; `.env.example` contains safe, non-secret examples only. Later Azure implementation
-must prefer Entra ID and managed identities, use least-privilege RBAC, and use Key Vault only
+are ignored; `.env.example` contains safe, non-secret examples only. Azure implementation prefers
+Entra ID and managed identities, uses least-privilege RBAC, and uses Key Vault only
 when a secret is unavoidable. See the [security baseline](docs/security/baseline.md).
 
 ## Milestone 1 integrated validation
 
 Repository 2 Milestone 1 ? **Cloud Data Platform Foundation** ? has completed its integrated Unit 10
-implementation and evidence collection and is awaiting final Governance implementation review and
-Git closure.
+implementation and evidence collection. Governance implementation review and Git closure are
+complete for the governed baseline, and Milestone 1 is **COMPLETE AND VALIDATED**.
 
 Validated development-platform evidence includes:
 

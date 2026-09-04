@@ -38,7 +38,7 @@ module replacementTransformationJob 'modules/container-apps-job.bicep' = {
     jobName: replacementJobName
     location: location
     managedEnvironmentId: replacementContainerAppsEnvironment.id
-    registryServer: acrLoginServer
+    registryServer: registry.properties.loginServer
     registryIdentityId: acrPullIdentity.id
     imageName: '${registry.properties.loginServer}/${imageName}'
     environmentName: environmentName
